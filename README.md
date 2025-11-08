@@ -190,6 +190,8 @@ gcc src/task2_truncate.c -o bin/task2_truncate
 ...
 ```
 
+---
+
 ## Usage Examples
 
 ```bash
