@@ -12,25 +12,26 @@
 int main(void)
 {
     int file_descriptor = open(FILENAME, O_WRONLY | O_CREAT | O_APPEND, FILE_MODE);
-    if(file_descriptor == -1){
+    if (file_descriptor == -1) {
         perror("open log");
         return EXIT_FAILURE;
     }
 
     char input_buffer[BUFFER_SIZE];
     ssize_t input_length = read(STDIN_FILENO, input_buffer, BUFFER_SIZE - 1);
-    if(input_length == -1){
+    if (input_length == -1) {
         perror("read input");
         close(file_descriptor);
         return EXIT_FAILURE;
     }
 
-    if(input_length == 0){
+    if (input_length == 0) {
         close(file_descriptor);
         return EXIT_SUCCESS;
     }
 
-    if(input_buffer[input_length - 1] == '\n'){
+    /* Remove trailing newline if present */
+    if (input_buffer[input_length - 1] == '\n') {
         input_length--;
     }
 
@@ -50,22 +51,31 @@ int main(void)
     output_buffer[output_index++] = '\n';
 
     ssize_t bytes_written = write(file_descriptor, output_buffer, output_index);
-    if(bytes_written != output_index){
+    if (bytes_written != output_index) {
         perror("write log");
         close(file_descriptor);
         return EXIT_FAILURE;
     }
 
     off_t final_offset = lseek(file_descriptor, 0, SEEK_CUR);
-    if(final_offset == -1){
+    if (final_offset == -1) {
         perror("lseek final offset");
         close(file_descriptor);
         return EXIT_FAILURE;
     }
 
-    printf("Final file offset => %ld\n", (long)final_offset);
+    printf("Final file offset: %ld\n", (long)final_offset);
 
-    if(close(file_descriptor) == -1){
+    /* 
+     * Why SEEK_CUR grows with O_APPEND:
+     * The O_APPEND flag forces each write() to occur at the current end of the file,
+     * regardless of the file descriptor's offset. However, the kernel still maintains
+     * an internal offset for the file descriptor. After a successful write, this
+     * offset is advanced by the number of bytes written. Therefore, lseek(fd, 0, SEEK_CUR)
+     * returns the position where the *next* write would occur if O_APPEND were not set.
+     */
+
+    if (close(file_descriptor) == -1) {
         perror("close");
         return EXIT_FAILURE;
     }
