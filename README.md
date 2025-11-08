@@ -178,7 +178,7 @@ Compares two files byte-by-byte and prints the first differing byte index, if an
 make                 # Build all
 ./task1_copy         # Run any task
 make clean           # Remove binaries + generated files
-
+```
 
 ---
 
