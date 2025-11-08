@@ -63,7 +63,7 @@ int main(void)
         return EXIT_FAILURE;
     }
 
-    printf("Final file offset: %ld\n", (long)final_offset);
+    printf("The final file offset => %ld\n", (long)final_offset);
 
     /* 
      * Why SEEK_CUR grows with O_APPEND:
